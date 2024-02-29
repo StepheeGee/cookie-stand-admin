@@ -1,6 +1,6 @@
 // components/CreateTable.js
 import React from 'react';
-import { hours } from '../data.js';
+import { time } from '../data.js';
 
 function CreateTable(props) {
   return (
@@ -9,7 +9,7 @@ function CreateTable(props) {
         <table className='m-7 mx-auto text-center bg-green-200'>
           <thead className='bg-green-600 text-center rounded-md '>
             <th className="rounded-md ">Location</th>
-            {hours.map(element => (
+            {time.map(element => (
               <th key={element} className='px-2 py-1 text-center rounded-md'>{element}</th>
             ))}
             <th className="rounded-md">Totals</th>
@@ -34,7 +34,7 @@ function CreateTable(props) {
         </table>
       ) : (
         <div className='text-center'>
-          <h1 className='text-center font-bold text-2xl text-black-900'>Sorry! No Locations Available</h1>
+          <h1 className='text-center font-bold text-2xl text-black-900'>No cookie stands created, yet.</h1>
         </div>
       )}
     </div>

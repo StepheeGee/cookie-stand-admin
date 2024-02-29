@@ -3,7 +3,7 @@ import React from 'react';
 import { hours } from '../data.js';
 
 function Table({ cookieStands, hoursTotals }) {
-  if (locations.length) {
+  if (cookieStands.length) {
     return (
             <table className="w-1/2 mx-auto border-4 border-collapse border-green-500 mt-10 bg-green-200">
                 <thead>

@@ -5,11 +5,11 @@ import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
 import CreateTable from '../components/CreateTable.js';
 import CreateForm from '../components/CreateForm.js';
+import { time } from '../data.js';
 
 export default function Home() {
   const [locations, setLocations] = useState([]);
   const [total, setTotal] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [answeredQuestions, setAnsweredQuestions] = useState([]); // Define and initialize answeredQuestions
 
   const onCreate = (cookieStand) => {
     setLocations([...locations, cookieStand]);
@@ -23,15 +23,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header answers={answeredQuestions} title={'Cookie Stand Admin'} />
+      <Header title={'Cookie Stand Admin'} />
 
       <main className="flex-grow">
         <div id="big_container" className="bg-green-400 flex-col flex w-10/12 my-10 p-4 m-auto rounded-md">
           <h2 className="text-center font-semibold text-2xl">Create Cookie Stands</h2>
           <br />
-          <CreateForm onCreate={onCreate} />
+          <CreateForm onCreate={onCreate} time={time} />
         </div>
-        <CreateTable locations={locations} total={total} />
+        <CreateTable locations={locations} total={total} time={time} />
       </main>
 
       <Footer nlocation={locations} />

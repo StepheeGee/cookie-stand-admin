@@ -1,6 +1,6 @@
 // components/CreateForm.js
 import React, { useState } from 'react';
-import { hours } from '../data.js';
+import { time } from '../data.js';
 
 function CreateForm({ onCreate }) {
   const [location, setLocation] = useState('');
@@ -10,35 +10,37 @@ function CreateForm({ onCreate }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+  
     const minNum = Math.floor(parseInt(min));
     const maxNum = Math.floor(parseInt(max));
     const avgNum = parseFloat(avg);
-
+  
     let hour = [];
     let sum = 0;
-
-    for (let h = 0; h < hours.length; h++) {
+  
+    for (let h = 0; h < time.length; h++) {
       let val = Math.floor((Math.random() * (maxNum - minNum + 1) + minNum) * avgNum);
       hour.push(val);
       sum += val;
     }
     hour.push(sum);
-
+  
     const newStand = {
       location,
       stand: hour,
+      hourly_sales: [48, 42, 30, 24, 42, 24, 36, 42, 42, 48, 36, 42, 24, 36],
     };
-
+  
     // Pass the new stand data to the parent component
     onCreate(newStand);
-
+  
     // Clear form inputs
     setLocation('');
     setMin('');
     setMax('');
     setAvg('');
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className='bg-green-300 p-8 rounded-3xl'>
@@ -80,7 +82,7 @@ function CreateForm({ onCreate }) {
         <div className='bg-green-100 p-4 rounded-xl m-2'>
           <label className='p-2 text-black'>Average Cookies per Sale</label><br />
           <input
-            className='w-full text-black'  // Apply text-black class here
+            className='w-full text-black'  
             name="avg"
             type="number"
             id='avg'
