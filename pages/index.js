@@ -1,98 +1,121 @@
-// // pages/index.js
-// import Head from 'next/head';
-// import { useState } from 'react';
-// import Header from '../components/Header.js';
-// import Footer from '../components/Footer.js';
-// import CreateTable from '../components/CreateTable.js';
-// import CreateForm from '../components/CreateForm.js';
-// import { time } from '../data.js';
-
-// export default function Home() {
-//   const [locations, setLocations] = useState([]);
-//   const [total, setTotal] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-
-//   const onCreate = (cookieStand) => {
-//     setLocations([...locations, cookieStand]);
-//     setTotal(total.map((value, index) => value + cookieStand.stand[index]));
-//   };
-
-//   return (
-//     <div className="flex flex-col min-h-screen font-serif">
-//       <Head>
-//         <title>Cookie Stand Admin</title>
-//         <link rel="icon" href="/favicon.ico" />
-//       </Head>
-
-//       <Header title={'Cookie Stand Admin'} />
-
-//       <main className="flex-grow">
-//         <div id="big_container" className="bg-green-400 flex-col flex w-10/12 my-10 p-4 m-auto rounded-md">
-//           <h2 className="text-center font-semibold text-2xl">Create Cookie Stands</h2>
-//           <br />
-//           <CreateForm onCreate={onCreate} time={time} />
-//         </div>
-//         <CreateTable locations={locations} total={total} time={time} />
-//       </main>
-
-//       <Footer nlocation={locations} />
-//     </div>
-//   );
-// }
-
-// pages/index.js
-import { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import CreateTable from '../components/CreateTable';
-import CreateForm from '../components/CreateForm';
+import { useState, useEffect } from 'react';
 import LoginForm from '../components/LoginForm';
+import RegistrationForm from '../components/RegistrationForm';
+import CookieStandAdmin from '../components/CookieStandAdmin';
+import CookieStandHeader from '../components/Header';
+import Footer from '../components/Footer';
+import jwt from 'jsonwebtoken';
 
 export default function Home() {
-  const [locations, setLocations] = useState([]);
-  const [total, setTotal] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleLogin = (username, password) => {
+  useEffect(() => {
+    checkToken();
+  }, []);
 
-    if (username === 'demo' && password === 'password') {
-      setUser({ username });
-    } else {
-      alert('Invalid credentials');
+  const checkToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = jwt.decode(token);
+      if (user) setIsLoggedIn(true);
+    }
+  };
+
+  const handleLogin = async (username, password) => {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setIsLoggedIn(true);
+        setMessage('');
+      } else {
+        alert('Login failed: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login.');
     }
   };
 
   const handleLogout = () => {
-    // Simulate logout by resetting the user state
-    setUser(null);
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    setMessage('Successfully logged out.');
   };
 
-  const onCreate = (cookieStand) => {
-    setLocations([...locations, cookieStand]);
-    setTotal(total.map((value, index) => value + cookieStand.stand[index]));
+  const handleRegister = async (username, email, password) => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert('Registration successful, please log in.');
+        setIsRegistering(false);
+        setMessage('');
+      } else {
+        alert('Registration failed: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('An error occurred during registration.');
+    }
   };
+
+  const toggleShowRegistration = () => setIsRegistering(!isRegistering);
 
   return (
-    <div className="flex flex-col min-h-screen font-serif">
-      <Header title={'Cookie Stand Admin'} />
+    <div>
+      <CookieStandHeader /> {/* Include the header component */}
+      {!isLoggedIn ? (
+        <>
+          {message && <div className="alert alert-success">{message}</div>}
+          {isRegistering ? (
+            <>
+              <RegistrationForm onRegister={handleRegister} />
+              <p className="text-center mt-4">
+                Already have an account?{' '}
+                <button
+                  onClick={() => setIsRegistering(false)}
+                  className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out"
+                >
+                  Login
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <LoginForm onLogin={handleLogin} />
+              <p className="text-center mt-4">
+                { /* Don't have an account? */}
+                { "Don't have an account? " }
+                <button
+                  onClick={toggleShowRegistration}
+                  className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out"
+                >
+                  Register
+                </button>
+              </p>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <CookieStandAdmin onLogout={handleLogout} />
+        </>
+      )}
+      <Footer nlocation={'OnlyAtlanta'} />
 
-      <main className="flex-grow">
-        {user ? (
-          <div id="big_container" className="bg-green-400 flex-col flex w-10/12 my-10 p-4 m-auto rounded-md">
-            <h2 className="text-center font-semibold text-2xl">Create Cookie Stands</h2>
-            <p>Welcome, {user.username}!</p>
-            <button onClick={handleLogout}>Logout</button>
-            <br />
-            <CreateForm onCreate={onCreate} />
-          </div>
-        ) : (
-          <LoginForm onLogin={handleLogin} />
-        )}
-
-        <CreateTable locations={locations} total={total} />
-      </main>
-
-      <Footer nlocation={locations} />
+     
     </div>
   );
 }
-
